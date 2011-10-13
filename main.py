@@ -11,7 +11,7 @@ def get_head(url, callback):
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
-        self.write("longen urls")
+        self.render("main.html")
 
 class ExpandHandler(tornado.web.RequestHandler):
     def handle_request(self, response):
@@ -19,15 +19,14 @@ class ExpandHandler(tornado.web.RequestHandler):
             if response.error:
                 print "Error:", response.error
             else:
-                print response.effective_url
-                self.write(response.effective_url)
-                print response.body
+                actual_url = response.effective_url
+                self.render("expanded.html", short_url=self.short_url, actual_url=actual_url)
         except:
             print traceback.format_exc()
-        self.finish()
     
     @tornado.web.asynchronous
     def get(self, short_url):
+        self.short_url = short_url
         get_head(short_url, self.handle_request)
 
 
@@ -51,6 +50,7 @@ class ExpandRedirectHandler(tornado.web.RequestHandler):
 application = tornado.web.Application([
     (r"/", MainHandler),
     (r"/e/(.*)", ExpandHandler),
+    (r"/expand/(.*)", ExpandHandler),
     (r"/(.*)", ExpandRedirectHandler),
 ], debug=True)
 
