@@ -1,0 +1,16 @@
+# use glob syntax.
+syntax: glob
+
+*.a
+*.o
+*.py[co]
+*.so
+*.sw[nop]
+*~
+.#*
+[#]*#
+test.db
+
+# switch to regexp syntax.
+syntax: regexp
+^\.pc/
