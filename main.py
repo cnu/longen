@@ -1,9 +1,14 @@
+import os
+import traceback
+
 import tornado.ioloop
 import tornado.web
 from tornado.curl_httpclient import CurlAsyncHTTPClient
-# from tornado.httpclient import HTTPRequest
-# from tornado.httpclient import HTTPClient
-import traceback
+
+settings = dict(
+            template_path=os.path.join(os.path.dirname(__file__), "templates"),
+            static_path=os.path.join(os.path.dirname(__file__), "static"),
+        )
 
 def get_head(url, callback):
     http_client = CurlAsyncHTTPClient()
@@ -52,7 +57,7 @@ application = tornado.web.Application([
     (r"/e/(.*)", ExpandHandler),
     (r"/expand/(.*)", ExpandHandler),
     (r"/(.*)", ExpandRedirectHandler),
-], debug=True)
+], debug=True, **settings)
 
 if __name__ == "__main__":
     application.listen(8888)
