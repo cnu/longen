@@ -6,9 +6,17 @@
    </head>
    <body>
       <div id="main">
-        <h1>Longen</h1>
+        <h1><a href="/">Longen</a></h1>
         <h3>Expand any short URLs</h3>
-        {{ short_url }} - {{ actual_url }}
+      	<form action="/expand" method="GET">
+      	<input type="text" name="url" id="url" size="50" value="{{ short_url }}"/><br /><br/>
+      	<input type="submit" name="submit" value="Expand" class="button" />
+      	</form>
+      	<br/>
+      	<p>
+	      	<label for="actual_url">Expanded to (click here to select)</label><br/>
+	      	<input type="text" name="url" id="actual_url" size="50" value="{{ actual_url }}"/><br /><br/>
+      	</p>
       </div>
    </body>
  </html>
