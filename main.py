@@ -12,7 +12,7 @@ settings = dict(
 
 def get_head(url, callback):
     http_client = CurlAsyncHTTPClient()
-    http_client.fetch(url.encode('ascii'), callback, method='HEAD')
+    http_client.fetch(url.strip().encode('ascii'), callback, method='HEAD')
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
