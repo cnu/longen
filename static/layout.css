@@ -11,4 +11,27 @@ div#main {
     padding: 15px;
     border: 1px solid #000000;
     background-color: #eeeeee;
+    text-align:center;
+}
+h1 {
+	font-family: 'Sansita One', cursive;
+	font-size:72px;
+	margin:5px;
+}
+
+h3{
+	margin:5px;
+	margin-bottom:15px;
+	font-size:20px;
+	font-family:Helvetica,Verdana,san-serif;
+	color:#666;
+}
+
+input#url {
+	width:100%;
+	padding:5px;
+}
+
+input.button {
+	padding:5px 10px 5px 10px;
 }

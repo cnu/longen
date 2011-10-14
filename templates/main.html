@@ -1,13 +1,17 @@
 <html>
    <head>
       <title>Longen - UnShorten URLs</title>
+      <link href='http://fonts.googleapis.com/css?family=Sansita+One' rel='stylesheet' type='text/css'>
       <link rel="stylesheet" type="text/css" href="{{ static_url("layout.css") }}"/>
    </head>
    <body>
       <div id="main">
+      	<h1>Longen</h1>
+      	<h3>Expand any short URLs</h3>
       	<form action="/expand" method="GET">
-      	<input type="text" name="url" id="url" size="50" /><br />
-      	<input type="submit" name="submit" value="Longen" />
+      	<input type="text" name="url" id="url" size="50" /><br /><br/>
+      	<input type="submit" name="submit" value="Expand" class="button" />
+      	<!-- <input type="button" name="redirect" value="Redirect" class="button" /> -->
       	</form>
 
       </div>
