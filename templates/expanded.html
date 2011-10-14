@@ -14,8 +14,10 @@
       	</form>
       	<br/>
       	<p>
-	      	<label for="actual_url">Expanded to (click here to select)</label><br/>
-	      	<input type="text" name="url" id="actual_url" size="50" value="{{ actual_url }}"/><br /><br/>
+	      	<label for="actual_url">Expanded to</label><br/>
+	      	<input type="text" name="url" id="actual_url" size="50" value="{{ actual_url }}" readonly="readonly"/><br /><br/>
+	      	<label for="redirect_url">Or you can go directly to the URL</label> <br/>
+	      	<a id="redirect_url" href="/r?url={{ short_url }}">http://localhost:8888/r?url={{ short_url }}</a>
       	</p>
       </div>
    </body>
