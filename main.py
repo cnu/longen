@@ -26,19 +26,25 @@ class ExpandHandler(tornado.web.RequestHandler):
     @gen.engine
     def get(self):
         short_url = self.request.arguments['url'][0].strip().encode('ascii') # TODO: Maybe take in multiple URLs?
-        # result = yield gen.Task(c.hgetall, self.short_url)
-        # print result
-
-        # c.hgetall(self.short_url, redis_callback)
-        # get_head(self.short_url, self.handle_request)
-        response = yield gen.Task(http_client.fetch, short_url, method='HEAD')
-        if response.error:
-            print response.error
-            print "Error for %s: %s" %(short_url, str(response.error))
-            actual_url = 'Error reading from URL'
+        result = yield gen.Task(c.hgetall, short_url)
+        if result:
+            # Get URL from cache
+            actual_url = result['actual_url']
+            hits = result['hits']
+            yield gen.Task(c.hincrby, short_url, 'hits', 1)
         else:
-            actual_url = response.effective_url
-        self.render("expanded.html", short_url=short_url, actual_url=actual_url)
+            response = yield gen.Task(http_client.fetch, short_url, method='HEAD')
+            if response.error:
+                print response.error
+                print "Error for %s: %s" %(short_url, str(response.error))
+                actual_url = 'Error reading from URL'
+            else:
+                actual_url = response.effective_url
+                hits = 1
+                yield [gen.Task(c.hset, short_url, 'actual_url', actual_url),
+                       gen.Task(c.hset, short_url, 'hits', 1)]
+
+        self.render("expanded.html", short_url=short_url, actual_url=actual_url, hits=hits)
 
 
 class ExpandRedirectHandler(tornado.web.RequestHandler):
@@ -47,13 +53,22 @@ class ExpandRedirectHandler(tornado.web.RequestHandler):
     def get(self):
         short_url = self.request.arguments['url'][0].strip().encode('ascii')
         response = yield gen.Task(http_client.fetch, short_url, method='HEAD')
-        if response.error:
-            print response.error
-            print "Error for %s: %s" %(short_url, str(response.error))
-            self.redirect('/')
+        result = yield gen.Task(c.hgetall, short_url)
+        if result:
+            # Get URL from cache
+            actual_url = result['actual_url']
+            hits = result['hits']
+            yield gen.Task(c.hincrby, short_url, 'hits', 1)
         else:
-            self.redirect(response.effective_url, permanent=True)
-
+            response = yield gen.Task(http_client.fetch, short_url, method='HEAD')
+            if response.error:
+                print "Error for %s: %s" %(short_url, str(response.error))
+                actual_url = '/'
+            else:
+                actual_url = response.effective_url
+                yield [gen.Task(c.hset, short_url, 'actual_url', actual_url),
+                       gen.Task(c.hset, short_url, 'hits', 1)]
+        self.redirect(actual_url, permanent=True)
 
 application = tornado.web.Application([
     (r"/", MainHandler),
