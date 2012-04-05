@@ -1,13 +1,17 @@
 import os
 import md5
+import logging
 import traceback
 
 import tornado.ioloop
 import tornado.web
+import tornado.options
 from tornado.curl_httpclient import CurlAsyncHTTPClient
 from tornado import gen
 
 import brukva
+
+tornado.options.parse_command_line()
 
 settings = dict(
             template_path=os.path.join(os.path.dirname(__file__), "templates"),
@@ -27,6 +31,7 @@ class ExpandHandler(tornado.web.RequestHandler):
     @gen.engine
     def get(self):
         short_url = self.request.arguments['url'][0].strip().encode('ascii') # TODO: Maybe take in multiple URLs?
+        logging.info("Expand: %s" % short_url)
         url_md5 = md5.md5(short_url).hexdigest()
         result = yield gen.Task(c.get, url_md5)
         if result:
@@ -35,8 +40,8 @@ class ExpandHandler(tornado.web.RequestHandler):
         else:
             response = yield gen.Task(http_client.fetch, short_url, method='HEAD')
             if response.error:
-                print response.error
-                print "Error for %s: %s" %(short_url, str(response.error))
+                logging.error(response.error)
+                logging.error("Error for %s: %s" %(short_url, str(response.error)))
                 actual_url = 'Error reading from URL'
             else:
                 actual_url = response.effective_url
@@ -50,6 +55,7 @@ class ExpandRedirectHandler(tornado.web.RequestHandler):
     @gen.engine
     def get(self):
         short_url = self.request.arguments['url'][0].strip().encode('ascii')
+        logging.info("Redirect: %s" % short_url)
         url_md5 = md5.md5(short_url).hexdigest()
         result = yield gen.Task(c.get, url_md5)
         if result:
@@ -58,7 +64,8 @@ class ExpandRedirectHandler(tornado.web.RequestHandler):
         else:
             response = yield gen.Task(http_client.fetch, short_url, method='HEAD')
             if response.error:
-                print "Error for %s: %s" %(short_url, str(response.error))
+                logging.error(response.error)
+                logging.error("Error for %s: %s" %(short_url, str(response.error)))
                 actual_url = '/'
             else:
                 actual_url = response.effective_url
