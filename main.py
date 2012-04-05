@@ -1,4 +1,5 @@
 import os
+import md5
 import traceback
 
 import tornado.ioloop
@@ -26,12 +27,11 @@ class ExpandHandler(tornado.web.RequestHandler):
     @gen.engine
     def get(self):
         short_url = self.request.arguments['url'][0].strip().encode('ascii') # TODO: Maybe take in multiple URLs?
-        result = yield gen.Task(c.hgetall, short_url)
+        url_md5 = md5.md5(short_url).hexdigest()
+        result = yield gen.Task(c.get, url_md5)
         if result:
             # Get URL from cache
-            actual_url = result['actual_url']
-            hits = result['hits']
-            yield gen.Task(c.hincrby, short_url, 'hits', 1)
+            actual_url = result
         else:
             response = yield gen.Task(http_client.fetch, short_url, method='HEAD')
             if response.error:
@@ -40,11 +40,9 @@ class ExpandHandler(tornado.web.RequestHandler):
                 actual_url = 'Error reading from URL'
             else:
                 actual_url = response.effective_url
-                hits = 1
-                yield [gen.Task(c.hset, short_url, 'actual_url', actual_url),
-                       gen.Task(c.hset, short_url, 'hits', 1)]
+                yield gen.Task(c.set, url_md5,actual_url)
 
-        self.render("expanded.html", short_url=short_url, actual_url=actual_url, hits=hits)
+        self.render("expanded.html", short_url=short_url, actual_url=actual_url)
 
 
 class ExpandRedirectHandler(tornado.web.RequestHandler):
@@ -52,13 +50,11 @@ class ExpandRedirectHandler(tornado.web.RequestHandler):
     @gen.engine
     def get(self):
         short_url = self.request.arguments['url'][0].strip().encode('ascii')
-        response = yield gen.Task(http_client.fetch, short_url, method='HEAD')
-        result = yield gen.Task(c.hgetall, short_url)
+        url_md5 = md5.md5(short_url).hexdigest()
+        result = yield gen.Task(c.get, url_md5)
         if result:
             # Get URL from cache
-            actual_url = result['actual_url']
-            hits = result['hits']
-            yield gen.Task(c.hincrby, short_url, 'hits', 1)
+            actual_url = result
         else:
             response = yield gen.Task(http_client.fetch, short_url, method='HEAD')
             if response.error:
@@ -66,8 +62,7 @@ class ExpandRedirectHandler(tornado.web.RequestHandler):
                 actual_url = '/'
             else:
                 actual_url = response.effective_url
-                yield [gen.Task(c.hset, short_url, 'actual_url', actual_url),
-                       gen.Task(c.hset, short_url, 'hits', 1)]
+                yield gen.Task(c.set, url_md5, actual_url)
         self.redirect(actual_url, permanent=True)
 
 application = tornado.web.Application([
