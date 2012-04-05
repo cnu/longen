@@ -11,8 +11,6 @@ from tornado import gen
 
 import brukva
 
-tornado.options.enable_pretty_logging()
-
 settings = dict(
             template_path=os.path.join(os.path.dirname(__file__), "templates"),
             static_path=os.path.join(os.path.dirname(__file__), "static"),
