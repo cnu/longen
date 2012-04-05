@@ -31,6 +31,7 @@ class ExpandHandler(tornado.web.RequestHandler):
     @gen.engine
     def get(self):
         short_url = self.request.arguments['url'][0].strip().encode('ascii') # TODO: Maybe take in multiple URLs?
+        format = self.request.arguments.get('format', [''])[0].strip()
         logging.info("Expand: %s" % short_url)
         url_md5 = md5.md5(short_url).hexdigest()
         result = yield gen.Task(c.get, url_md5)
@@ -48,8 +49,12 @@ class ExpandHandler(tornado.web.RequestHandler):
             else:
                 actual_url = response.effective_url
                 yield gen.Task(c.set, url_md5,actual_url)
-
-        self.render("expanded.html", short_url=short_url, actual_url=actual_url)
+        if format == 'text':
+            self.set_header("Content-Type", "text/plain")
+            self.write(actual_url)
+            self.finish()
+        else:
+            self.render("expanded.html", short_url=short_url, actual_url=actual_url)
 
 
 class ExpandRedirectHandler(tornado.web.RequestHandler):
