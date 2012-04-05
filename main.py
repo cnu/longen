@@ -17,8 +17,7 @@ settings = dict(
             template_path=os.path.join(os.path.dirname(__file__), "templates"),
             static_path=os.path.join(os.path.dirname(__file__), "static"),
         )
-
-c = brukva.Client()
+c = brukva.Client(host='herring.redistogo.com', port=9695, password='ea4d081449dd0cc17540ba41eab8c742')
 c.connect()
 http_client = CurlAsyncHTTPClient()
 
