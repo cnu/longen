@@ -11,7 +11,7 @@ from tornado import gen
 
 import brukva
 
-tornado.options.parse_command_line()
+#tornado.options.parse_command_line()
 
 settings = dict(
             template_path=os.path.join(os.path.dirname(__file__), "templates"),
@@ -85,5 +85,6 @@ application = tornado.web.Application([
 ], debug=True, **settings)
 
 if __name__ == "__main__":
-    application.listen(8888)
+    port = int(os.environ.get('PORT', 8888))
+    application.listen(port)
     tornado.ioloop.IOLoop.instance().start()
