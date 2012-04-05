@@ -1,4 +1,5 @@
 -e git://github.com/cnu/brukva.git@dd276033ff889df97759d943edbf83175b71bdfd#egg=brukva-dev
+gunicorn==0.14.2
 pycurl==7.19.0
 tornado==2.2
 wsgiref==0.1.2
