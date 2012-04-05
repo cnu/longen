@@ -55,3 +55,12 @@ label {
 	font-size:small;
 	color:#333;
 }
+
+p a {
+	text-decoration:none;
+	font-size:small;
+}
+
+p a:hover{
+	text-decoration:underline;
+};

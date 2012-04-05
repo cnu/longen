@@ -31,7 +31,7 @@
 	      	<input type="text" name="url" id="actual_url" size="50" value="{{ actual_url }}" readonly="readonly" onfocus="javascript:select();"/><br /><br/>
 	      	{% if not actual_url.startswith('Error') %}
 	      	<label for="redirect_url">Or you can go directly to the URL</label> <br/>
-	      	<a id="redirect_url" href="/r?url={{ short_url }}">http://longen.herokuapp.com/r?url={{ short_url }}</a>
+	      	<a id="redirect_url" href="{{ actual_url }}">{{ actual_url }}</a>
 	      	{% end %}
       	</p>
          <p id="footer">&copy; 2011 Srinivasan</p>
