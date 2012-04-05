@@ -11,13 +11,16 @@ from tornado import gen
 
 import brukva
 
-#tornado.options.parse_command_line()
+tornado.options.enable_pretty_logging()
 
 settings = dict(
             template_path=os.path.join(os.path.dirname(__file__), "templates"),
             static_path=os.path.join(os.path.dirname(__file__), "static"),
         )
-c = brukva.Client(host='herring.redistogo.com', port=9695, password='ea4d081449dd0cc17540ba41eab8c742')
+REDIS_HOST = os.environ.get('REDIS_HOST')
+REDIS_PORT = int(os.environ.get('REDIS_PORT'))
+REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD')
+c = brukva.Client(host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD)
 c.connect()
 http_client = CurlAsyncHTTPClient()
 
