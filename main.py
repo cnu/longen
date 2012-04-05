@@ -37,7 +37,9 @@ class ExpandHandler(tornado.web.RequestHandler):
         if result:
             # Get URL from cache
             actual_url = result
+            logging.info("From Cache")
         else:
+            logging.info("From Request")            
             response = yield gen.Task(http_client.fetch, short_url, method='HEAD')
             if response.error:
                 logging.error(response.error)
@@ -61,7 +63,9 @@ class ExpandRedirectHandler(tornado.web.RequestHandler):
         if result:
             # Get URL from cache
             actual_url = result
+            logging.info("From Cache")
         else:
+            logging.info("From Request")
             response = yield gen.Task(http_client.fetch, short_url, method='HEAD')
             if response.error:
                 logging.error(response.error)
